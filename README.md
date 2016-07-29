@@ -21,6 +21,7 @@ Get today's JIMS 1058 report and save it in the `data` directory.
 
 - push to GitHub
 - set up the cron (likely via lambda)?
+- tests
 
 ## Context
 

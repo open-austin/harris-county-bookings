@@ -8,13 +8,13 @@ The latest JIMS 1058 report can be found at http://www.jims.hctx.net/jimshome/ji
 Install dependencies.
 
 ```
-bundle install
+pip install -r requirements.txt
 ```
 
 Get today's JIMS 1058 report and save it in the `data` directory.
 
 ```
-bundle exec rake save_today
+./save_today.py
 ```
 
 ## TODO

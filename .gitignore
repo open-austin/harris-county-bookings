@@ -1,3 +1,4 @@
 *.swp
 .DS_Store
 *.pyc
+harris_county_bookings/settings.py

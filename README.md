@@ -17,9 +17,17 @@ Get today's JIMS 1058 report and save it in the `data` directory.
 ./save_today.py
 ```
 
+To get today's JIMS 1058 report and and save it as a commit in a GitHub repository, first create a
+`harris_county_bookings/settings.py` file containing your GitHub information. (See
+`harris_county_bookings/settings_example.py` for an example of the contents.) The run `save_today.py` with the
+`--commit` flag.
+
+```
+./save_today.py --commit
+```
+
 ## TODO
 
-- push to GitHub
 - set up the cron (likely via lambda)?
 - tests
 

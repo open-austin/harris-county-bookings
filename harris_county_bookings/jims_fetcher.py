@@ -14,6 +14,9 @@ class JIMSFetcher(object):
     @staticmethod
     def save_to_file(date, directory=DATA_DIR):
         file_path = JIMSFetcher.build_file_path(date, directory)
+        dirname = os.path.dirname(file_path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         with open(file_path, 'w+') as f:
             f.write(JIMSFetcher.read())
         return file_path

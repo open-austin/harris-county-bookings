@@ -2,3 +2,5 @@
 .DS_Store
 *.pyc
 harris_county_bookings/settings.py
+harris_county_bookings-*.zip
+dist/

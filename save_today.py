@@ -6,9 +6,15 @@ from datetime import date
 from harris_county_bookings import *
 
 
-# lambda handler
+# noinspection PyUnusedLocal
+def lambda_handler(event, context):
+    save_today_as_commit()
+
+
 def save_today_as_commit():
-    print(JIMSFetcher.save_to_github_commit(date.today())['content']['html_url'])
+    result = JIMSFetcher.save_to_github_commit(date.today())
+    if result:
+        print(result['content']['html_url'])
 
 
 def save_today_as_file():

@@ -14,11 +14,12 @@ def lambda_handler(event, context):
 def save_today_as_commit():
     result = JIMSFetcher.save_to_github_commit(date.today())
     if result:
-        print(result['content']['html_url'])
+        urls = {r['content']['html_url'] for r in result}
+        print ' '.join(urls)
 
 
 def save_today_as_file():
-    print(JIMSFetcher.save_to_file(date.today()))
+    print ' '.join(JIMSFetcher.save_to_file(date.today()))
 
 
 if __name__ == '__main__':

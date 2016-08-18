@@ -7,6 +7,7 @@ import requests
 from constants import *
 from github_publisher import GitHubPublisher
 from utils import *
+from dialects import ACCDB, CSV, ALL_DIALECTS
 
 
 class JIMSRecorder(object):
@@ -16,11 +17,6 @@ class JIMSRecorder(object):
                        'ADDRESS STREET', 'ADDRESS SUFFIX', 'ADDRESS ALI', 'ADDRESS CITY', 'ADDRESS STATE',
                        'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL', 'DISPOSITION']
 
-    ACCDB = 'accdb'
-    CSV = 'excel'
-    ALL_DIALECTS = [CSV, ACCDB]
-    csv.register_dialect(ACCDB, delimiter=';')
-
     @staticmethod
     def read():
         return requests.get(JIMS_1058_URL).text
@@ -29,7 +25,7 @@ class JIMSRecorder(object):
     def parse():
         raw_data = JIMSRecorder.read().split('\n')
         headers = raw_data[0].split(';')
-        data = list(csv.DictReader(raw_data[1:], fieldnames=headers, dialect=JIMSRecorder.ACCDB))
+        data = list(csv.DictReader(raw_data[1:], fieldnames=headers, dialect=ACCDB))
         return map(Utils.strip_whitespace_from_values, data)
 
     @staticmethod
@@ -74,6 +70,6 @@ class JIMSRecorder(object):
 
     @staticmethod
     def build_file_path(date, directory, dialect=CSV):
-        extension = 'csv' if dialect == JIMSRecorder.CSV else dialect
+        extension = 'csv' if dialect == CSV else dialect
         filename = '%s.%s' % (date.strftime('%Y-%m-%d'), extension)
         return os.path.join(directory, str(date.year), filename)

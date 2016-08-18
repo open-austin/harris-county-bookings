@@ -75,5 +75,5 @@ class JIMSRecorder(object):
     @staticmethod
     def build_file_path(date, directory, dialect=CSV):
         extension = 'csv' if dialect == JIMSRecorder.CSV else dialect
-        filename = "%s.%s" % (date.strftime('%Y-%m-%d'), extension)
+        filename = '%s.%s' % (date.strftime('%Y-%m-%d'), extension)
         return os.path.join(directory, str(date.year), filename)

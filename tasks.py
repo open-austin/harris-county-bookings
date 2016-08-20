@@ -38,7 +38,7 @@ def create_lambda(ctx):
     print('Creating the AWS Lambda function for %s' % dist_zip)
     cmd = ('aws lambda create-function --function-name harris_county_bookings'
            ' --zip-file fileb://%s --handler save_today.lambda_handler'
-           ' --runtime python2.7 --role arn:aws:iam::153011574665:role/lambda_basic_execution'
+           ' --runtime python2.7 --role arn:aws:iam::994940854184:role/lambda_basic_execution'
            ' --timeout 300 --description "Function to pull Harris County JIMS 1058 reports"')
     ctx.run(cmd % dist_zip)
 

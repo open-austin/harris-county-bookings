@@ -35,21 +35,23 @@ def dist(ctx):
 def create_lambda(ctx):
     """One-time task to create the AWS Lambda function"""
     dist_zip = 'harris_county_bookings-%s.zip' % VERSION
-    print('Creating the AWS Lambda function for %s' % dist_zip)
-    cmd = ('aws lambda create-function --function-name harris_county_bookings'
+    name = 'harris_county_bookings-%s' % (VERSION.replace('.', '_'))
+    print('Creating AWS Lambda function %s with %s' % (name, dist_zip))
+    cmd = ('aws lambda create-function --function-name %s'
            ' --zip-file fileb://%s --handler save_today.lambda_handler'
            ' --runtime python2.7 --role arn:aws:iam::994940854184:role/lambda_basic_execution'
            ' --timeout 300 --description "Function to pull Harris County JIMS 1058 reports"')
-    ctx.run(cmd % dist_zip)
+    ctx.run(cmd % (name, dist_zip))
 
 
 @task(dist)
 def deploy(ctx):
     """Deploy code to the AWS Lambda function"""
     dist_zip = 'harris_county_bookings-%s.zip' % VERSION
-    print('Updating the AWS Lambda function with %s' % dist_zip)
-    cmd = 'aws lambda update-function-code --function-name harris_county_bookings --zip-file fileb://%s'
-    ctx.run(cmd % dist_zip)
+    name = 'harris_county_bookings-%s' % (VERSION.replace('.', '_'))
+    print('Updating AWS Lambda function %s with %s' % (name, dist_zip))
+    cmd = 'aws lambda update-function-code --function-name %s --zip-file fileb://%s'
+    ctx.run(cmd % (name, dist_zip))
 
 
 @task

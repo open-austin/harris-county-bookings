@@ -11,7 +11,7 @@ def dist(ctx):
     """Build a distribution zip that is intended for AWS Lambda"""
     # noinspection PyUnresolvedReferences
     # checking to see if you've made a correct harris_county_bookings/settings.py
-    from harris_county_bookings.settings import GITHUB_API_TOKEN, GITHUB_BRANCH, GITHUB_REPO_NAME
+    from harris_county_bookings.settings import GITHUB_API_TOKEN, GITHUB_REPOS
 
     dist_root_dir = 'dist'
     dist_dir = '%s/harris_county_bookings' % dist_root_dir

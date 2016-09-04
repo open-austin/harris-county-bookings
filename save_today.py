@@ -4,7 +4,6 @@ import argparse
 from datetime import date
 
 from harris_county_bookings import *
-from harris_county_bookings.constants import *
 
 
 # noinspection PyUnusedLocal

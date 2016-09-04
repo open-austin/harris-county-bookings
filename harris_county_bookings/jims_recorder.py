@@ -9,6 +9,11 @@ from github_publisher import GitHubPublisher
 from utils import *
 from dialects import ACCDB, CSV, ALL_DIALECTS
 
+RAW = 'raw'
+SCRUB = 'scrub'
+ALL_MODES = [RAW, SCRUB]
+DATA_DIRS = {RAW: 'raw-data', SCRUB: 'data'}
+
 
 class JIMSRecorder(object):
     # The headers left out of this list are the headers that contain personal data

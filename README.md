@@ -33,13 +33,13 @@ Get today's _scrubbed_ JIMS 1058 report and save it in the `data` directory.
 Get today's _raw_ JIMS 1058 report and save it in the `raw-data` directory.
 
 ```
-./save_today.py --mode raw
+./save_today.py --data_mode raw
 ```
 
 Get both today's raw and scrubbed JIMS 1058 report and dave them in the appropriate directories. 
 
 ```
-./save_today.py --mode both
+./save_today.py --data_mode both
 ```
 
 To get today's JIMS 1058 report and and save it as a commit in a GitHub repository, first create a
@@ -64,7 +64,7 @@ invoke clean create_lambda
 invoke clean deploy
 ```
 
-The deployed Lambda function will be the equivalent of running `./save_today.py --commit --mode both`.
+The deployed Lambda function will be the equivalent of running `./save_today.py --commit --data_mode both`.
 
 ## TODO
 

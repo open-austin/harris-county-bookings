@@ -1,4 +1,5 @@
 import base64
+
 import requests
 
 __all__ = ['GitHubPublisher']

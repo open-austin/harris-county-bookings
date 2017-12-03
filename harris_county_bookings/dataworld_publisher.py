@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 __all__ = ['DataWorldPublisher']
@@ -33,7 +34,7 @@ class DataWorldPublisher(object):
     def data_exists(self, stream_name, data):
         """
         Runs a SQL query to verify that today's data hasn't already been pushed.
-        Currently checks a single entry
+        Currently just checks the first entry.
         """
         verification_sample = json.loads(data.split('\n')[0])
         arrestee_id = verification_sample['ARRESTEE ID']

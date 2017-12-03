@@ -38,7 +38,7 @@ Get both today's raw and scrubbed JIMS 1058 report and save them in the appropri
 ./save_today.py --data_mode both
 ```
 
-To get today's JIMS 1058 report and and to either, save it as a commit in a GitHub repository, or publish it 
+To get today's JIMS 1058 report and to either, save it to a GitHub repository, or publish it 
 to data.world, first create a `harris_county_bookings/settings.py` file and include your GitHub and/or data.world 
 information. (See `harris_county_bookings/settings_example.py` for an example of the contents.) Then run 
 `save_today.py` with the `--commit` and/or the `dataset` flag.
@@ -54,7 +54,7 @@ Examples:
 
 ### Lambda Usage
 
-1. Create the `harris_county_bookings/settings.py` file. See above for more info.
+1. Create the `harris_county_bookings/settings.py` file as previously mentioned.
 2. Configure AWS credentials via the usual means (i.e. `aws configure` or environment variables).
 3. Manage the Lambda function.
  * Initial deployment: `invoke clean create_lambda`

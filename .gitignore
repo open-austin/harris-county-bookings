@@ -1,6 +1,9 @@
+*.pyc
 *.swp
 .DS_Store
-*.pyc
+
+.idea
+dist
+
 harris_county_bookings/settings.py
 harris_county_bookings-*.zip
-dist/

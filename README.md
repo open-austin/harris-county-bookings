@@ -29,27 +29,27 @@ Get today's _scrubbed_ JIMS 1058 report and save it in the `data` directory.
 Get today's _raw_ JIMS 1058 report and save it in the `raw-data` directory.
 
 ```
-./save_today.py --data_mode raw
+./save_today.py --mode raw
 ```
 
 Get both today's raw and scrubbed JIMS 1058 report and save them in the appropriate directories. 
 
 ```
-./save_today.py --data_mode both
+./save_today.py --mode both
 ```
 
 To get today's JIMS 1058 report and to either, save it to a GitHub repository, or publish it 
 to data.world, first create a `harris_county_bookings/settings.py` file and include your GitHub and/or data.world 
 information. (See `harris_county_bookings/settings_example.py` for an example of the contents.) Then run 
-`save_today.py` with the `--commit` and/or the `dataset` flag.
+`save_today.py` with the `--commit` and/or the `--dataset` flag.
 
-The `--data_mode` flag can be used in combination to suit your needs.
+The `--mode` flag can be used in combination to suit your needs.
 
 Examples:
 ```
 ./save_today.py --commit
 ./save_today.py --dataset
-./save_today.py --commit --dataset --data_mode raw
+./save_today.py --commit --dataset --mode raw
 ```
 
 ### Lambda Usage
@@ -60,7 +60,7 @@ Examples:
  * Initial deployment: `invoke clean create_lambda`
  * Subsequent code updates: `invoke clean deploy`
 
-The deployed Lambda function will execute `./save_today.py --commit --dataset --data_mode both`.
+The deployed Lambda function will execute `./save_today.py --commit --dataset --mode both`.
 
 ## TODO
 

@@ -5,7 +5,7 @@ __all__ = ['Utils']
 
 class Utils(object):
     @staticmethod
-    def filter_dict_keys(dictionary, keys):
+    def filter_keys_from_dict(dictionary, keys):
         return {k: v for k, v in filter(lambda t: t[0] in keys, dictionary.items())}
 
     @staticmethod

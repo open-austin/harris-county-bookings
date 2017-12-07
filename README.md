@@ -1,9 +1,7 @@
 # harris-county-bookings
 
 A searchable repository which aggregates the daily Harris County Justice Information and Management System 1058 
-reports (JIMS 1058). The latest JIMS 1058 report can be found via the 
-[Harris County JIMS site](http://www.jims.hctx.net/jimshome/jimsreports/jims1058.txt). This information 
-is intended for researchers and non-profits looking to do studies on policing in Harris County.
+reports (JIMS 1058) of arrests from the [Harris County Sheriff's Office](http://home.jims.hctx.net/). The latest JIMS 1058 report can be found via the [Harris County JIMS site](http://www.jims.hctx.net/jimshome/jimsreports/jims1058.txt). This information is intended for researchers and non-profits looking to do studies on policing in Harris County.
 
 In this public repository, personal information data is removed and the abridged dataset is saved to the 
 [`data`](https://github.com/open-austin/harris-county-bookings/tree/master/data) directory. The fields that 

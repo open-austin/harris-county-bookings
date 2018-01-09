@@ -12,6 +12,12 @@ from .github_publisher import GitHubPublisher
 from .s3_publisher import S3Publisher
 from .utils import *
 
+# The settings file is optional
+try:
+    from . import settings
+except:
+    pass
+
 RAW = 'raw'
 SCRUB = 'scrub'
 ALL_MODES = [RAW, SCRUB]
@@ -111,9 +117,6 @@ class JIMSRecorder(object):
 
     @staticmethod
     def save_to_s3(data, date, modes=ALL_MODES, dialects=ALL_DIALECTS):
-        # Do the import here so the rest of the methods work without defining settings
-        from . import settings
-
         results = []
         for mode in modes:
             directory = DATA_DIRS[mode]
@@ -130,9 +133,6 @@ class JIMSRecorder(object):
 
     @staticmethod
     def save_to_github(data, date, modes=ALL_MODES, dialects=ALL_DIALECTS):
-        # Do the import here so the rest of the methods work without defining settings
-        from . import settings
-
         results = []
         for mode in modes:
             directory = DATA_DIRS[mode]
@@ -156,9 +156,6 @@ class JIMSRecorder(object):
 
     @staticmethod
     def save_to_dataworld(data, date, modes=ALL_MODES):
-        # Do the import here so the rest of the methods work without defining settings
-        from . import settings
-
         results = []
         for mode in modes:
             stream_name = date.year

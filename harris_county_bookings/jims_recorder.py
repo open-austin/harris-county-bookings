@@ -63,7 +63,7 @@ class JIMSRecorder(object):
             bucket_info = settings.S3_BUCKETS[RAW]
             publisher = S3Publisher(bucket_info)
             # TODO verify access to the bucket
-            publisher.publish('originals/' + filename, raw_data.content)
+            publisher.publish('original-files/' + filename, raw_data.content)
 
         raw_data = raw_data.text.split('\n')
         headers = raw_data[0].split(';')

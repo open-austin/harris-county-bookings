@@ -21,9 +21,9 @@ DATA_DIRS = {RAW: 'raw-data', SCRUB: 'data'}
 class JIMSRecorder(object):
     # The headers left out of this list are the headers that contain personal data
     # https://github.com/open-austin/harris-county-bookings/issues/4
-    SCRUBBED_HEADERS = ['ARRESTEE ID', 'SEX', 'RACE', 'ARREST DATE', 'BOOKING DATE', 'ADDRESS NUMBER', 'ADDRESS PREFIX',
-                        'ADDRESS STREET', 'ADDRESS SUFFIX', 'ADDRESS ALI', 'ADDRESS CITY', 'ADDRESS STATE',
-                        'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL', 'DISPOSITION']
+    SCRUBBED_HEADERS = ['ARRESTEE ID', 'SEX', 'RACE', 'ARREST DATE', 'BOOKING DATE', 'ADDRESS CITY',
+                        'ADDRESS STATE', 'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL',
+                        'DISPOSITION']
     ALL_HEADERS = SCRUBBED_HEADERS + ['BOOKING NUMBER', 'NAME', 'DATE OF BIRTH', 'CASE NUMBER']
 
     @staticmethod
@@ -37,12 +37,15 @@ class JIMSRecorder(object):
             return row
         data = map(generate_identifier, data)
 
+        # Standardizes the three date columns to the 'mm/dd/yyyy' format
         def standardize_dates(row):
-            # TODO standardize the three date columns to 'mm/dd/yyyy'
+            row['ARRESTEE DATE'] = Utils.standardize_date(row['ARRESTEE DATE'], '%m%d%Y')
+            row['BOOKING DATE'] = Utils.standardize_date(row['BOOKING DATE'], '%m%d%Y')
+            row['DATE OF BIRTH'] = Utils.standardize_date(row['DATE OF BIRTH'], '%m/%d/%y')
             return row
         data = map(standardize_dates, data)
 
-        # TODO reduce granularity on the addresses
+        # TODO reduce granularity on the raw addresses & add it to scrubbed data
 
         return list(data)
 
@@ -95,8 +98,12 @@ class JIMSRecorder(object):
         return output
 
     @staticmethod
+    def get_headers(mode):
+        return JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
+
+    @staticmethod
     def build_dict_writer(output, mode, dialect):
-        headers = JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
+        headers = JIMSRecorder.get_headers(mode)
         return csv.DictWriter(output, headers, extrasaction='ignore', dialect=dialect)
 
     @staticmethod
@@ -109,6 +116,7 @@ class JIMSRecorder(object):
             directory = DATA_DIRS[mode]
             bucket_info = settings.S3_BUCKETS[mode]
             for dialect in dialects:
+                # TODO ensure it's saving correctly
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
                 output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
                 publisher = S3Publisher(bucket_info)
@@ -140,7 +148,7 @@ class JIMSRecorder(object):
 
     @staticmethod
     def prepare_jsonl(mode, data):
-        headers = JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
+        headers = JIMSRecorder.get_headers(mode)
         data = (Utils.filter_keys_from_dict(e, headers) for e in data)
         return '\n'.join((json.dumps(e) for e in data))
 

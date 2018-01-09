@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 
 __all__ = ['Utils']
 
@@ -12,6 +13,10 @@ class Utils(object):
     def generate_hash(string):
         hash_object = hashlib.sha1(string.encode())
         return hash_object.hexdigest()
+
+    @staticmethod
+    def standardize_date(dt, incoming_format):
+        return datetime.strptime(dt, incoming_format).strftime('%m/%d/%Y')
 
     @staticmethod
     def strip_whitespace_from_values(dictionary):

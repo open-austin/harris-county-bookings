@@ -62,11 +62,12 @@ def save_to_file(data, date, modes):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Save today's JIMS 1058 report")
-    mode_help = "Define which mode to use to scrub the data. '{}' will save the data as is. " \
+    mode_help = "Select what privacy level to use when saving the data. '{}' will save the data as is. " \
                 "'{}' will scrub out personal data. 'both' will save files for " \
                 "each mode in separate directories.".format(RAW, SCRUB)
     parser.add_argument('--mode', default=SCRUB, choices=[RAW, SCRUB, 'both'], help=mode_help)
     parser.add_argument('--commit', action='store_true', help='Save the file to GitHub.')
     parser.add_argument('--dataset', action='store_true', help='Save the file to a data.world dataset.')
+    parser.add_argument('--s3', action='store_true', help='Save the file to an S3 bucket.')
 
     local_handler(parser.parse_args())

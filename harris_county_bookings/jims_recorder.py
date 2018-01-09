@@ -110,7 +110,6 @@ class JIMSRecorder(object):
             bucket_info = settings.S3_BUCKETS[mode]
             for dialect in dialects:
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
-                bucket_info = settings.S3_BUCKETS[mode]
                 output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
                 publisher = S3Publisher(bucket_info)
                 result = publisher.publish(file_path, output.getvalue())

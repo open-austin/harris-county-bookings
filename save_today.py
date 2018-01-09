@@ -18,7 +18,7 @@ def lambda_handler(event, context):
 def local_handler(args):
     today = dt.today()
     data = JIMSRecorder.fetch_and_clean_data(s3=args.s3, date=today)
-    modes = [args.data_mode] if args.data_mode != 'both' else ALL_MODES
+    modes = [args.mode] if args.mode != 'both' else ALL_MODES
 
     if args.s3:
         save_to_s3(data, today, modes)
@@ -35,9 +35,9 @@ def local_handler(args):
 
 def save_to_s3(data, date, modes):
     result = JIMSRecorder.save_to_s3(data, date, modes)
-    # if result:
-    #     urls = (r['content']['html_url'] for r in result)
-    #     print(' '.join(urls))
+    if result:
+        urls = (r for r in result)
+        print(' '.join(urls))
 
 
 def save_to_github(data, date, modes):

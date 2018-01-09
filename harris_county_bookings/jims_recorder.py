@@ -39,7 +39,7 @@ class JIMSRecorder(object):
 
         # Standardizes the three date columns to the 'mm/dd/yyyy' format
         def standardize_dates(row):
-            row['ARRESTEE DATE'] = Utils.standardize_date(row['ARRESTEE DATE'], '%m%d%Y')
+            row['ARREST DATE'] = Utils.standardize_date(row['ARREST DATE'], '%m%d%Y')
             row['BOOKING DATE'] = Utils.standardize_date(row['BOOKING DATE'], '%m%d%Y')
             row['DATE OF BIRTH'] = Utils.standardize_date(row['DATE OF BIRTH'], '%m/%d/%y')
             return row
@@ -116,7 +116,6 @@ class JIMSRecorder(object):
             directory = DATA_DIRS[mode]
             bucket_info = settings.S3_BUCKETS[mode]
             for dialect in dialects:
-                # TODO ensure it's saving correctly
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
                 output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
                 publisher = S3Publisher(bucket_info)

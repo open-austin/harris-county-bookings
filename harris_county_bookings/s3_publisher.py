@@ -12,5 +12,6 @@ class S3Publisher(object):
         self._key_prefix = bucket_info['key']
 
     def publish(self, key_part, data):
-        self._s3.upload_fileobj(data, self._bucket, self._key_prefix + key_part)
-        return 's3://' + self._bucket + self._key_prefix + key_part
+        key = '{}/{}'.format(self._key_prefix, key_part)
+        self._s3.put_object(Body=data, Bucket=self._bucket, Key=key)
+        return 's3://{}/{}'.format(self._bucket, key)

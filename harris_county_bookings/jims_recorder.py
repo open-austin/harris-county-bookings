@@ -57,14 +57,15 @@ class JIMSRecorder(object):
         """
         from . import settings
 
-        raw_data = requests.get(JIMS_1058_URL).text.split('\n')
+        raw_data = requests.get(JIMS_1058_URL)
         if s3:
             filename = '{}.txt'.format(date.strftime('%Y-%m-%d'))
             bucket_info = settings.S3_BUCKETS[RAW]
             publisher = S3Publisher(bucket_info)
             # TODO verify access to the bucket
-            publisher.publish(filename, raw_data)
+            publisher.publish('originals/' + filename, raw_data.content)
 
+        raw_data = raw_data.text.split('\n')
         headers = raw_data[0].split(';')
         data = list(csv.DictReader(raw_data[1:], fieldnames=headers, dialect=ACCDB))
         return JIMSRecorder.clean(data)
@@ -117,7 +118,7 @@ class JIMSRecorder(object):
             bucket_info = settings.S3_BUCKETS[mode]
             for dialect in dialects:
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
-                output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
+                output = JIMSRecorder.write_csv(io.StringIO(), data, mode, dialect)
                 publisher = S3Publisher(bucket_info)
                 result = publisher.publish(file_path, output.getvalue())
                 if result:
@@ -136,7 +137,7 @@ class JIMSRecorder(object):
             repo_info = settings.GITHUB_REPOS[mode]
             for dialect in dialects:
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
-                output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
+                output = JIMSRecorder.write_csv(io.StringIO(), data, mode, dialect)
                 publisher = GitHubPublisher(repo_info, settings.GITHUB_API_TOKEN)
                 # TODO verify the token has commit access to the repo
                 result = publisher.publish(file_path, output.getvalue())

@@ -5,7 +5,7 @@ If you only are only saving to local files, then these are not needed.
 
 S3_BUCKETS = {
     # 'bucket': name of the bucket
-    # 'key': syntax: /some_folder/
+    # 'key': syntax: a_folder/another_folder
     #
     # For the 'scrub' bucket, one sub-folder named 'data' is created
     # For the 'raw' bucket, two sub-folders are created: 'original-files' & 'raw-data'

@@ -24,7 +24,9 @@ class JIMSRecorder(object):
     SCRUBBED_HEADERS = ['ARRESTEE ID', 'SEX', 'RACE', 'ARREST DATE', 'BOOKING DATE', 'ADDRESS CITY',
                         'ADDRESS STATE', 'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL',
                         'DISPOSITION']
-    ALL_HEADERS = SCRUBBED_HEADERS + ['BOOKING NUMBER', 'NAME', 'DATE OF BIRTH', 'CASE NUMBER']
+    ALL_HEADERS = SCRUBBED_HEADERS + ['BOOKING NUMBER', 'NAME', 'DATE OF BIRTH', 'CASE NUMBER',
+                                      'ADDRESS NUMBER', 'ADDRESS PREFIX', 'ADDRESS STREET',
+                                      'ADDRESS SUFFIX', 'ADDRESS ALI']
 
     @staticmethod
     def clean(data):

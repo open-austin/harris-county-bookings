@@ -6,7 +6,7 @@ The latest JIMS 1058 report can be found via the [Harris County JIMS site](http:
 This information is intended for researchers and non-profits looking to do studies on policing in Harris County.
 
 In this public repository, personal information data is removed and the abridged dataset is saved to the 
-[`data`](data) directory. Please see [JIMSRecorder#ALL_HEADERS](jims_recorder.py#L27) 
+[`data`](data) directory. Please see [JIMSRecorder#ALL_HEADERS](harris_county_bookings/jims_recorder.py#L27) 
 for the latest on which headers are removed. If your research requires the raw data, please contact 
 [Open Austin](mailto:info@open-austin.org) for access to 
 [open-austin/harris-county-bookings-raw](https://github.com/open-austin/harris-county-bookings-raw). 

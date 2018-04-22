@@ -9,7 +9,14 @@ from .constants import *
 from .dialects import ACCDB, CSV, ALL_DIALECTS
 from .dataworld_publisher import DataWorldPublisher
 from .github_publisher import GitHubPublisher
+from .s3_publisher import S3Publisher
 from .utils import *
+
+# The settings file is optional
+try:
+    from . import settings
+except:
+    pass
 
 RAW = 'raw'
 SCRUB = 'scrub'
@@ -20,14 +27,12 @@ DATA_DIRS = {RAW: 'raw-data', SCRUB: 'data'}
 class JIMSRecorder(object):
     # The headers left out of this list are the headers that contain personal data
     # https://github.com/open-austin/harris-county-bookings/issues/4
-    SCRUBBED_HEADERS = ['ARRESTEE ID', 'SEX', 'RACE', 'ARREST DATE', 'BOOKING DATE', 'ADDRESS NUMBER', 'ADDRESS PREFIX',
-                        'ADDRESS STREET', 'ADDRESS SUFFIX', 'ADDRESS ALI', 'ADDRESS CITY', 'ADDRESS STATE',
-                        'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL', 'DISPOSITION']
-    ALL_HEADERS = SCRUBBED_HEADERS + ['BOOKING NUMBER', 'NAME', 'DATE OF BIRTH', 'CASE NUMBER']
-
-    @staticmethod
-    def read():
-        return requests.get(JIMS_1058_URL).text
+    SCRUBBED_HEADERS = ['ARRESTEE ID', 'SEX', 'RACE', 'ARREST DATE', 'BOOKING DATE', 'ADDRESS CITY',
+                        'ADDRESS STATE', 'ADDRESS ZIP', 'CHARGE CODE', 'CHARGE WORDING', 'CHARGE LEVEL',
+                        'DISPOSITION']
+    ALL_HEADERS = SCRUBBED_HEADERS + ['BOOKING NUMBER', 'NAME', 'DATE OF BIRTH', 'CASE NUMBER',
+                                      'ADDRESS NUMBER', 'ADDRESS PREFIX', 'ADDRESS STREET',
+                                      'ADDRESS SUFFIX', 'ADDRESS ALI']
 
     @staticmethod
     def clean(data):
@@ -40,12 +45,35 @@ class JIMSRecorder(object):
             return row
         data = map(generate_identifier, data)
 
-        # TODO fix bug in which 'ADDRESS STREET' is split amongst two columns
+        # Standardizes the three date columns to the 'mm/dd/yyyy' format
+        def standardize_dates(row):
+            row['ARREST DATE'] = Utils.standardize_date(row['ARREST DATE'], '%m%d%Y')
+            row['BOOKING DATE'] = Utils.standardize_date(row['BOOKING DATE'], '%m%d%Y')
+            row['DATE OF BIRTH'] = Utils.standardize_date(row['DATE OF BIRTH'], '%m/%d/%y')
+            return row
+        data = map(standardize_dates, data)
+
+        # TODO reduce granularity on the raw addresses & add it to scrubbed data
+
         return list(data)
 
     @staticmethod
-    def parse():
-        raw_data = JIMSRecorder.read().split('\n')
+    def fetch_and_clean_data(s3=False, date=None):
+        """
+        :param date: Today's date
+        :param s3: If true, the original file will be saved to an s3 bucket
+        """
+        from . import settings
+
+        raw_data = requests.get(JIMS_1058_URL)
+        if s3:
+            filename = '{}.txt'.format(date.strftime('%Y-%m-%d'))
+            bucket_info = settings.S3_BUCKETS[RAW]
+            publisher = S3Publisher(bucket_info)
+            # TODO verify access to the bucket
+            publisher.publish('original-files/' + filename, raw_data.content)
+
+        raw_data = raw_data.text.split('\n')
         headers = raw_data[0].split(';')
         data = list(csv.DictReader(raw_data[1:], fieldnames=headers, dialect=ACCDB))
         return JIMSRecorder.clean(data)
@@ -57,8 +85,7 @@ class JIMSRecorder(object):
         return os.path.join(directory, str(date.year), filename)
 
     @staticmethod
-    def save_to_file(date, modes=ALL_MODES, dialects=ALL_DIALECTS):
-        data = JIMSRecorder.parse()
+    def save_to_file(data, date, modes=ALL_MODES, dialects=ALL_DIALECTS):
         file_paths = []
         for mode in modes:
             for dialect in dialects:
@@ -80,23 +107,39 @@ class JIMSRecorder(object):
         return output
 
     @staticmethod
+    def get_headers(mode):
+        return JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
+
+    @staticmethod
     def build_dict_writer(output, mode, dialect):
-        headers = JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
+        headers = JIMSRecorder.get_headers(mode)
         return csv.DictWriter(output, headers, extrasaction='ignore', dialect=dialect)
 
     @staticmethod
-    def save_to_github(date, modes=ALL_MODES, dialects=ALL_DIALECTS):
-        # Do the import here so the rest of the methods work without defining settings
-        from . import settings
+    def save_to_s3(data, date, modes=ALL_MODES, dialects=ALL_DIALECTS):
+        results = []
+        for mode in modes:
+            directory = DATA_DIRS[mode]
+            bucket_info = settings.S3_BUCKETS[mode]
+            for dialect in dialects:
+                file_path = JIMSRecorder.build_file_path(date, directory, dialect)
+                output = JIMSRecorder.write_csv(io.StringIO(), data, mode, dialect)
+                publisher = S3Publisher(bucket_info)
+                result = publisher.publish(file_path, output.getvalue())
+                if result:
+                    results.append(result)
 
-        data = JIMSRecorder.parse()
+        return results
+
+    @staticmethod
+    def save_to_github(data, date, modes=ALL_MODES, dialects=ALL_DIALECTS):
         results = []
         for mode in modes:
             directory = DATA_DIRS[mode]
             repo_info = settings.GITHUB_REPOS[mode]
             for dialect in dialects:
                 file_path = JIMSRecorder.build_file_path(date, directory, dialect)
-                output = JIMSRecorder.write_csv(io.BytesIO(), data, mode, dialect)
+                output = JIMSRecorder.write_csv(io.StringIO(), data, mode, dialect)
                 publisher = GitHubPublisher(repo_info, settings.GITHUB_API_TOKEN)
                 # TODO verify the token has commit access to the repo
                 result = publisher.publish(file_path, output.getvalue())
@@ -107,16 +150,12 @@ class JIMSRecorder(object):
 
     @staticmethod
     def prepare_jsonl(mode, data):
-        headers = JIMSRecorder.ALL_HEADERS if mode == RAW else JIMSRecorder.SCRUBBED_HEADERS
-        data = (Utils.filter_dict_keys(e, headers) for e in data)
+        headers = JIMSRecorder.get_headers(mode)
+        data = (Utils.filter_keys_from_dict(e, headers) for e in data)
         return '\n'.join((json.dumps(e) for e in data))
 
     @staticmethod
-    def save_to_dataworld(date, modes=ALL_MODES):
-        # Do the import here so the rest of the methods work without defining settings
-        from . import settings
-
-        data = JIMSRecorder.parse()
+    def save_to_dataworld(data, date, modes=ALL_MODES):
         results = []
         for mode in modes:
             stream_name = date.year

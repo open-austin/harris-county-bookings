@@ -6,9 +6,9 @@ __all__ = ['DataWorldPublisher']
 
 
 class DataWorldPublisher(object):
-    def __init__(self, dataset, token):
-        self._dataset_owner = dataset['owner']
-        self._dataset_name = dataset['name']
+    def __init__(self, dataset_info, token):
+        self._dataset_owner = dataset_info['owner']
+        self._dataset_name = dataset_info['name']
         self._api_url = 'https://api.data.world/v0/{{}}/{0}/{1}/{{}}'.format(self._dataset_owner, self._dataset_name)
         self._token = token
 
@@ -41,15 +41,16 @@ class DataWorldPublisher(object):
         arrest_date = verification_sample['ARREST DATE']
         booking_date = verification_sample['BOOKING DATE']
         charge_code = verification_sample['CHARGE CODE']
-        query_body = "SELECT * FROM {} WHERE arrestee_id = '{}' and arrest_date = '{}' " \
-                     "and booking_date = '{}' and charge_code = '{}'"
+        query_body = "SELECT * FROM {} WHERE arrestee_id = '{}' AND arrest_date = '{}' " \
+                     "AND booking_date = '{}' AND charge_code = '{}'"
         query = {'query': query_body.format(stream_name, arrestee_id, arrest_date, booking_date, charge_code)}
 
         res = requests.post(self._api_url.format('sql', ''), data=query, headers=self.__build_auth_header())
         print("Queried {} in {}, received following response: {}".format(stream_name, self._dataset_name, res.text))
         res.raise_for_status()
 
-        if res.text:
+        # Check that the query was successful and that it's not empty
+        if res.status_code == 200 and res.json():
             return True
         else:
             return False
